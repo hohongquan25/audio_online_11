@@ -27,9 +27,15 @@ export default function Header() {
     return pathname.startsWith(href);
   }
 
+  // Handle mobile menu toggle - iOS Safari compatible
+  const handleMenuToggle = () => {
+    console.log('[Header] Menu toggle triggered');
+    setMobileOpen((v) => !v);
+  };
+
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--bg-card-border)] bg-[var(--bg-primary)]/95 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-[var(--bg-card-border)] bg-[var(--bg-primary)] shadow-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8" style={{ position: 'relative', zIndex: 1 }}>
         <Link href="/" className="flex items-center gap-2">
           <span className="text-2xl">🎧</span>
           <span className="text-xl font-bold text-white">TruyệnAudio</span>
@@ -87,8 +93,23 @@ export default function Header() {
         {/* Mobile hamburger */}
         <div className="flex items-center gap-2 md:hidden">
           <NotificationBell />
-          <button type="button" onClick={() => setMobileOpen((v) => !v)} className="rounded-md p-2 text-gray-400 hover:bg-[#2a2a4a]" aria-label="Menu">
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <button 
+            type="button" 
+            onClick={handleMenuToggle}
+            className="rounded-md p-3 text-gray-400 hover:bg-[#2a2a4a] active:bg-[#3a3a5a]" 
+            style={{ 
+              minWidth: '48px',
+              minHeight: '48px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              position: 'relative',
+              zIndex: 9999
+            }}
+            aria-label="Menu"
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ pointerEvents: 'none' }}>
               {mobileOpen
                 ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 : <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />}

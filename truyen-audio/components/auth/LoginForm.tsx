@@ -15,12 +15,16 @@ export default function LoginForm() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    e.stopPropagation();
+    console.log('[LoginForm] Form submitted');
     setError("");
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+
+    console.log('[LoginForm] Attempting login for:', email);
 
     const result = await signIn("credentials", {
       email,
@@ -29,11 +33,13 @@ export default function LoginForm() {
     });
 
     if (result?.error) {
+      console.log('[LoginForm] Login error:', result.error);
       setError("Email hoặc mật khẩu không đúng");
       setLoading(false);
       return;
     }
 
+    console.log('[LoginForm] Login successful, redirecting...');
     router.push(callbackUrl);
     router.refresh();
   }
@@ -81,7 +87,12 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full rounded-lg bg-purple-600 px-4 py-3 text-sm font-medium text-white hover:bg-purple-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed active:bg-purple-800"
+        style={{ 
+          minHeight: '48px',
+          position: 'relative',
+          zIndex: 10
+        }}
       >
         {loading ? "Đang xử lý..." : "Đăng nhập"}
       </button>

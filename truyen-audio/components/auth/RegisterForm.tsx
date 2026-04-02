@@ -13,6 +13,7 @@ export default function RegisterForm() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    e.stopPropagation();
     setErrors({});
     setGeneralError("");
     setLoading(true);
@@ -106,7 +107,12 @@ export default function RegisterForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full rounded-lg bg-purple-600 px-4 py-3 text-sm font-medium text-white hover:bg-purple-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed active:bg-purple-800"
+        style={{ 
+          minHeight: '48px',
+          position: 'relative',
+          zIndex: 10
+        }}
       >
         {loading ? "Đang xử lý..." : "Đăng ký"}
       </button>

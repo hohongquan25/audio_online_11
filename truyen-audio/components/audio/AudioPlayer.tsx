@@ -141,16 +141,16 @@ export default function AudioPlayer({ episode, initialProgress = 0, isPreviewOnl
   const pct = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="bg-[#111] border-t border-[#333]">
+    <div className="bg-[#111] border-t border-[#333] w-full">
       <audio ref={audioRef} src={episode.audioUrl} preload="metadata" onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onPause={handlePause} onPlay={handlePlay} onEnded={handleEnded} />
 
       {/* Progress bar — full width thin line at top */}
-      <div className="h-1 cursor-pointer bg-[#333]" onClick={handleSeek}>
+      <div className="h-1 cursor-pointer bg-[#333] touch-manipulation" onClick={handleSeek} style={{ touchAction: 'manipulation' }}>
         <div className="h-full bg-purple-600 transition-[width] duration-100" style={{ width: `${pct}%` }} />
       </div>
 
       {/* Single row player */}
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center gap-2 sm:gap-3 px-2 sm:px-6 lg:px-8 py-2">
         {/* Cover + info */}
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-[#222]">
@@ -192,25 +192,27 @@ export default function AudioPlayer({ episode, initialProgress = 0, isPreviewOnl
           </button>
 
           {/* Skip back */}
-          <button onClick={skipBackward} className="rounded p-1.5 text-gray-400 hover:text-white" aria-label="Tua lùi 15s">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <button onClick={skipBackward} className="rounded p-2 text-gray-400 hover:text-white active:text-purple-400 touch-manipulation" style={{ WebkitTapHighlightColor: 'rgba(124, 58, 237, 0.2)', touchAction: 'manipulation', minWidth: '44px', minHeight: '44px' }} aria-label="Tua lùi 15s">
+            <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
             </svg>
           </button>
 
           {/* Play/Pause */}
           <button onClick={togglePlay} disabled={previewLimitReached}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50" aria-label={isPlaying ? "Tạm dừng" : "Phát"}>
+            className="flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 active:bg-purple-800 touch-manipulation" 
+            style={{ WebkitTapHighlightColor: 'rgba(124, 58, 237, 0.3)', touchAction: 'manipulation' }}
+            aria-label={isPlaying ? "Tạm dừng" : "Phát"}>
             {isPlaying ? (
-              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" /></svg>
+              <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" /></svg>
             ) : (
-              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+              <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
             )}
           </button>
 
           {/* Skip forward */}
-          <button onClick={skipForward} className="rounded p-1.5 text-gray-400 hover:text-white" aria-label="Tua tiến 15s">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <button onClick={skipForward} className="rounded p-2 text-gray-400 hover:text-white active:text-purple-400 touch-manipulation" style={{ WebkitTapHighlightColor: 'rgba(124, 58, 237, 0.2)', touchAction: 'manipulation', minWidth: '44px', minHeight: '44px' }} aria-label="Tua tiến 15s">
+            <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
             </svg>
           </button>

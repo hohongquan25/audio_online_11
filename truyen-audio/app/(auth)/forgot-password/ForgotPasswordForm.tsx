@@ -22,10 +22,8 @@ export default function ForgotPasswordForm() {
       <div className="space-y-4">
         <div className="rounded-xl bg-green-900/20 border border-green-500/30 p-4 text-sm text-green-300">
           <p className="font-medium">Đã gửi yêu cầu!</p>
-          <p className="mt-1 text-green-400/80">Nếu email tồn tại, link đặt lại mật khẩu đã được tạo.</p>
-          <p className="mt-2 text-xs text-green-500/70">
-            Hiện tại chưa có email thật — link được log ra console server. Kiểm tra terminal dev server.
-          </p>
+          <p className="mt-1 text-green-400/80">Email đặt lại mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư!</p>
+         
         </div>
       </div>
     );

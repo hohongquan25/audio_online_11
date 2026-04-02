@@ -36,6 +36,22 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
+/* iOS Safari touch fixes */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a, [role="button"], input[type="submit"] {
+  -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button, input[type="submit"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
 ::-webkit-scrollbar-thumb { background: var(--bg-card-border); border-radius: 3px; }
