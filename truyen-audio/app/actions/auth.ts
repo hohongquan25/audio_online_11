@@ -2,13 +2,11 @@
 
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations";
+import { createEmailService } from "@/lib/email";
 import type { ActionResult } from "@/types";
-
-// In-memory store for password reset tokens (mock)
-// Maps token → { email, expiresAt }
-const resetTokens = new Map<string, { email: string; expiresAt: Date }>();
 
 export async function registerUser(data: {
   email: string;
@@ -18,7 +16,7 @@ export async function registerUser(data: {
   try {
     const parsed = registerSchema.safeParse(data);
     if (!parsed.success) {
-      const errors = parsed.error.issues ?? parsed.error.errors ?? [];
+      const errors = parsed.error.issues;
       const firstError = (errors[0] as { message?: string })?.message ?? "Dữ liệu không hợp lệ";
       return { success: false, message: firstError };
     }
@@ -58,28 +56,82 @@ export async function registerUser(data: {
 export async function requestPasswordReset(data: {
   email: string;
 }): Promise<ActionResult> {
-  const { email } = data;
+  try {
+    const { email } = data;
 
-  const user = await prisma.user.findUnique({ where: { email } });
+    // Validate email format with zod
+    const emailSchema = z.string().email({ message: "Invalid email format" });
+    const emailValidation = emailSchema.safeParse(email);
+    
+    if (!emailValidation.success) {
+      // Security: Don't reveal validation errors
+      console.log(`[Password Reset] Invalid email format attempted: ${email}`);
+      return {
+        success: true,
+        message: "Nếu email tồn tại, chúng tôi đã gửi link đặt lại mật khẩu.",
+      };
+    }
 
-  if (user) {
-    const token = crypto.randomUUID();
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    const user = await prisma.user.findUnique({ where: { email } });
 
-    // Delete old tokens for this email
-    await prisma.passwordResetToken.deleteMany({ where: { email } });
+    if (user) {
+      const token = crypto.randomUUID();
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-    // Save token to DB
-    await prisma.passwordResetToken.create({ data: { email, token, expiresAt } });
+      // Delete old tokens for this email
+      await prisma.passwordResetToken.deleteMany({ where: { email } });
 
-    const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/reset-password?token=${token}`;
-    console.log(`[Password Reset] Link for ${email}: ${resetUrl}`);
+      // Save token to DB
+      await prisma.passwordResetToken.create({ data: { email, token, expiresAt } });
+
+      const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/reset-password?token=${token}`;
+      
+      // Integrate EmailService to send real email
+      try {
+        const emailService = createEmailService();
+        await emailService.sendPasswordResetEmail({
+          to: email,
+          resetUrl,
+          expiryHours: 1,
+        });
+        
+        console.log(`[Password Reset] Success: Email sent to ${email}`);
+      } catch (emailError) {
+        // Log email sending errors
+        console.error('[Password Reset] Email sending failed:', {
+          email,
+          error: emailError instanceof Error ? emailError.message : 'Unknown error',
+          timestamp: new Date().toISOString(),
+        });
+        
+        return {
+          success: false,
+          message: "Không thể gửi email. Vui lòng thử lại sau.",
+        };
+      }
+    } else {
+      // Security: Log for monitoring but don't reveal to user
+      console.log(`[Password Reset] Request for non-existent email: ${email}`);
+    }
+
+    // Security response: same message regardless of email existence
+    return {
+      success: true,
+      message: "Nếu email tồn tại, chúng tôi đã gửi link đặt lại mật khẩu.",
+    };
+  } catch (error) {
+    // Log unexpected errors
+    console.error('[Password Reset] Unexpected error:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
+    
+    return {
+      success: false,
+      message: "Đã xảy ra lỗi. Vui lòng thử lại sau.",
+    };
   }
-
-  return {
-    success: true,
-    message: "Nếu email tồn tại, chúng tôi đã gửi link đặt lại mật khẩu.",
-  };
 }
 
 export async function resetPassword(data: {
