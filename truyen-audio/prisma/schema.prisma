@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  VIP
+  ADMIN
+}
+
+enum PlanType {
+  WEEK
+  MONTH
+  YEAR
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  password       String
+  name           String?
+  role           Role      @default(USER)
+  isBanned       Boolean   @default(false)
+  vipExpiredAt   DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  posts             Post[]
+  comments          Comment[]
+  payments          Payment[]
+  listeningHistory  ListeningHistory[]
+  likes             Like[]
+  ratings           Rating[]
+  storyComments     StoryComment[]
+  notificationReads NotificationRead[]
+  favorites         Favorite[]
+}
+
+model Story {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  description String
+  coverImage  String
+  isVip       Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  status      String    @default("ongoing") // ongoing | completed
+  viewCount   Int       @default(0)
+  avgRating   Float     @default(0)
+  ratingCount Int       @default(0)
+  categoryId  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  category      Category?      @relation(fields: [categoryId], references: [id])
+  episodes      Episode[]
+  ratings       Rating[]
+  storyComments StoryComment[]
+  favorites     Favorite[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  emoji     String   @default("📚")
+  createdAt DateTime @default(now())
+
+  stories Story[]
+}
+
+model Episode {
+  id            String   @id @default(cuid())
+  title         String
+  audioUrl      String
+  order         Int
+  duration      Int      // seconds
+  isFreePreview Boolean  @default(false)
+  storyId       String
+  createdAt     DateTime @default(now())
+
+  story            Story              @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  listeningHistory ListeningHistory[]
+
+  @@unique([storyId, order])
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  content   String
+  type      String   @default("general") // general | feedback | bug
+  likeCount Int      @default(0)
+  authorId  String
+  createdAt DateTime @default(now())
+
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments Comment[]
+  likes    Like[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  postId    String
+  authorId  String
+  createdAt DateTime @default(now())
+
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  userId      String
+  plan        PlanType
+  amount      Int
+  status      PaymentStatus
+  planName    String        @default("")
+  days        Int           @default(0)
+  note        String        @default("")
+  createdAt   DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ListeningHistory {
+  id              String   @id @default(cuid())
+  userId          String
+  episodeId       String
+  progressSeconds Int      @default(0)
+  updatedAt       DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, episodeId])
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  userId    String
+  storyId   String
+  score     Int      // 1-5
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId])
+}
+
+model StoryComment {
+  id        String   @id @default(cuid())
+  content   String
+  storyId   String
+  authorId  String
+  createdAt DateTime @default(now())
+
+  story  Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  author User  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model SiteSettings {
+  id             String  @id @default("default")
+  heroBackground String  @default("")
+  heroTitle      String  @default("Nghe truyện độc quyền mọi lúc, mọi nơi")
+  heroSubtitle   String  @default("Khám phá hàng ngàn tập truyện audio hấp dẫn từ các thể loại tiên hiệp, kiếm hiệp, ngôn tình đến trinh thám, kinh dị.")
+  updatedAt      DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reads NotificationRead[]
+}
+
+model NotificationRead {
+  id             String   @id @default(cuid())
+  userId         String
+  notificationId String
+  readAt         DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, notificationId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  storyId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId])
+}
+
+model VipPlan {
+  id          String   @id @default(cuid())
+  name        String
+  days        Int
+  price       Int
+  description String   @default("")
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

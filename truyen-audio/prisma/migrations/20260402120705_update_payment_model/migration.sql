@@ -1,0 +1,7 @@
+-- AlterEnum
+ALTER TYPE "PaymentStatus" ADD VALUE 'PENDING';
+
+-- AlterTable
+ALTER TABLE "Payment" ADD COLUMN     "days" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "note" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "planName" TEXT NOT NULL DEFAULT '';
