@@ -11,6 +11,7 @@ declare module "next-auth" {
       email: string;
       role: "USER" | "VIP" | "ADMIN";
       vipExpiredAt: Date | null;
+      code: string;
     };
   }
 }
@@ -21,6 +22,7 @@ declare module "@auth/core/jwt" {
     email: string;
     role: "USER" | "VIP" | "ADMIN";
     vipExpiredAt: Date | null;
+    code: string;
   }
 }
 
@@ -59,6 +61,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           role: user.role,
           vipExpiredAt: user.vipExpiredAt,
+          code: user.code,
         };
       },
     }),
@@ -70,6 +73,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.email = user.email as string;
         token.role = (user as any).role;
         token.vipExpiredAt = (user as any).vipExpiredAt;
+        token.code = (user as any).code;
       }
 
       // Always refresh role and vipExpiredAt from DB to catch admin promotions and VIP changes
@@ -77,11 +81,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.id },
-            select: { role: true, vipExpiredAt: true },
+            select: { role: true, vipExpiredAt: true, code: true },
           });
           if (dbUser) {
             token.role = dbUser.role as "USER" | "VIP" | "ADMIN";
             token.vipExpiredAt = dbUser.vipExpiredAt;
+            token.code = dbUser.code;
 
             // Check VIP expiration
             if (
@@ -109,6 +114,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.email = token.email as string;
       session.user.role = token.role;
       session.user.vipExpiredAt = token.vipExpiredAt;
+      session.user.code = token.code;
       return session;
     },
   },

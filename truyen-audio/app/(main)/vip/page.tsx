@@ -14,6 +14,7 @@ export default async function VipPage() {
     id: session.user.id,
     role: session.user.role,
     vipExpiredAt: session.user.vipExpiredAt ? new Date(session.user.vipExpiredAt).toISOString() : null,
+    code: session.user.code || "",
   } : null;
 
   // QR code info from site settings (we'll use a placeholder)

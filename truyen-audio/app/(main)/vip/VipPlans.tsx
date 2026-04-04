@@ -8,7 +8,7 @@ interface Plan { id: string; name: string; days: number; price: number; descript
 interface QrInfo { bankName: string; accountNumber: string; accountName: string; qrImage: string; }
 
 interface Props {
-  user: { id: string; role: string; vipExpiredAt: string | null } | null;
+  user: { id: string; role: string; vipExpiredAt: string | null; code: string } | null;
   plans: Plan[];
   qrInfo: QrInfo;
 }
@@ -71,7 +71,7 @@ export default function VipPlans({ user, plans, qrInfo }: Props) {
             <div className="flex justify-between py-1"><span className="text-gray-500">Số tài khoản</span><span className="font-medium text-gray-200">{qrInfo.accountNumber}</span></div>
             <div className="flex justify-between py-1"><span className="text-gray-500">Chủ tài khoản</span><span className="font-medium text-gray-200">{qrInfo.accountName}</span></div>
             <div className="flex justify-between py-1"><span className="text-gray-500">Số tiền</span><span className="font-bold text-purple-400">{selectedPlan.price.toLocaleString("vi-VN")}đ</span></div>
-            <div className="flex justify-between py-1"><span className="text-gray-500">Nội dung CK</span><span className="font-medium text-gray-200">VIP {selectedPlan.name}</span></div>
+            <div className="flex justify-between py-1"><span className="text-gray-500">Nội dung CK</span><span className="font-medium text-gray-200">{user?.code || ""}</span></div>
           </div>
 
           <p className="mb-4 text-center text-xs text-gray-500">Sau khi chuyển khoản, nhấn nút bên dưới. Admin sẽ xác nhận và cấp VIP trong vòng 24h.</p>

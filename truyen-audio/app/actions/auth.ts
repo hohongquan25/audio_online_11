@@ -6,6 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations";
 import { createEmailService } from "@/lib/email";
+import { generateUserCode } from "@/lib/user-code";
 import type { ActionResult } from "@/types";
 
 export async function registerUser(data: {
@@ -33,12 +34,23 @@ export async function registerUser(data: {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Generate unique code for new user
+    let code = generateUserCode();
+    let codeExists = await prisma.user.findUnique({ where: { code } });
+    
+    // Regenerate if code already exists (very rare)
+    while (codeExists) {
+      code = generateUserCode();
+      codeExists = await prisma.user.findUnique({ where: { code } });
+    }
+
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         name: name || null,
         role: "USER",
+        code,
       },
     });
 

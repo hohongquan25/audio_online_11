@@ -14,6 +14,8 @@ export async function createPendingPayment(planId: string): Promise<ActionResult
     const plan = await prisma.vipPlan.findUnique({ where: { id: planId } });
     if (!plan || !plan.isActive) return { success: false, message: "Gói VIP không hợp lệ" };
 
+    const userCode = session.user.code || "";
+
     const payment = await prisma.payment.create({
       data: {
         userId: session.user.id,
@@ -22,7 +24,7 @@ export async function createPendingPayment(planId: string): Promise<ActionResult
         status: "PENDING",
         planName: plan.name,
         days: plan.days,
-        note: `Người dùng đã xác nhận chuyển khoản - chờ admin duyệt`,
+        note: `Mã CK: ${userCode} - Chờ admin duyệt`,
       },
     });
 
