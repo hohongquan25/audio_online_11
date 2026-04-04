@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPendingPayment } from "@/app/actions/payment";
+import { generateTransferContent } from "@/lib/transfer-content";
 
 interface Plan { id: string; name: string; days: number; price: number; description: string; }
 interface QrInfo { bankName: string; accountNumber: string; accountName: string; qrImage: string; }
 
 interface Props {
-  user: { id: string; role: string; vipExpiredAt: string | null } | null;
+  user: { id: string; role: string; vipExpiredAt: string | null; email: string } | null;
   plans: Plan[];
   qrInfo: QrInfo;
 }
@@ -53,6 +54,8 @@ export default function VipPlans({ user, plans, qrInfo }: Props) {
   }
 
   if (step === "qr" && selectedPlan) {
+    const transferContent = user ? generateTransferContent(user.email, selectedPlan.name) : "";
+    
     return (
       <div className="mx-auto max-w-md">
         <div className="rounded-2xl border border-[#2a2a4a] bg-[#1a1a2e] p-6">
@@ -71,7 +74,7 @@ export default function VipPlans({ user, plans, qrInfo }: Props) {
             <div className="flex justify-between py-1"><span className="text-gray-500">Số tài khoản</span><span className="font-medium text-gray-200">{qrInfo.accountNumber}</span></div>
             <div className="flex justify-between py-1"><span className="text-gray-500">Chủ tài khoản</span><span className="font-medium text-gray-200">{qrInfo.accountName}</span></div>
             <div className="flex justify-between py-1"><span className="text-gray-500">Số tiền</span><span className="font-bold text-purple-400">{selectedPlan.price.toLocaleString("vi-VN")}đ</span></div>
-            <div className="flex justify-between py-1"><span className="text-gray-500">Nội dung CK</span><span className="font-medium text-gray-200">VIP {selectedPlan.name}</span></div>
+            <div className="flex justify-between py-1"><span className="text-gray-500">Nội dung CK</span><span className="font-medium text-gray-200">{transferContent}</span></div>
           </div>
 
           <p className="mb-4 text-center text-xs text-gray-500">Sau khi chuyển khoản, nhấn nút bên dưới. Admin sẽ xác nhận và cấp VIP trong vòng 24h.</p>

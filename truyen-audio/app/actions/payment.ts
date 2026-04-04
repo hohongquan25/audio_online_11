@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import type { ActionResult } from "@/types";
+import { generateTransferContent } from "@/lib/transfer-content";
 
 // Create a PENDING payment only when user confirms transfer
 export async function createPendingPayment(planId: string): Promise<ActionResult> {
@@ -14,6 +15,8 @@ export async function createPendingPayment(planId: string): Promise<ActionResult
     const plan = await prisma.vipPlan.findUnique({ where: { id: planId } });
     if (!plan || !plan.isActive) return { success: false, message: "Gói VIP không hợp lệ" };
 
+    const transferContent = generateTransferContent(session.user.email || "", plan.name);
+
     const payment = await prisma.payment.create({
       data: {
         userId: session.user.id,
@@ -22,7 +25,7 @@ export async function createPendingPayment(planId: string): Promise<ActionResult
         status: "PENDING",
         planName: plan.name,
         days: plan.days,
-        note: `Người dùng đã xác nhận chuyển khoản - chờ admin duyệt`,
+        note: `Nội dung CK: ${transferContent} - Chờ admin duyệt`,
       },
     });
 
