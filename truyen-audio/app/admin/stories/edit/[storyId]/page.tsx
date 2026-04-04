@@ -25,11 +25,59 @@ export default function EditStoryPage() {
   const [epForm, setEpForm] = useState({ title: "", audioUrl: "", order: 1, duration: 0, isFreePreview: false });
   const [epLoading, setEpLoading] = useState(false);
   const [epMsg, setEpMsg] = useState("");
+  const [detectingDuration, setDetectingDuration] = useState(false);
 
   // Edit episode
   const [editEpId, setEditEpId] = useState<string | null>(null);
   const [editEpForm, setEditEpForm] = useState({ title: "", audioUrl: "", order: 1, duration: 0, isFreePreview: false });
   const [editEpLoading, setEditEpLoading] = useState(false);
+  const [editDetectingDuration, setEditDetectingDuration] = useState(false);
+
+  // Auto-detect duration from audio URL
+  async function detectAudioDuration(url: string, isEdit: boolean = false) {
+    if (!url) return;
+    
+    if (isEdit) {
+      setEditDetectingDuration(true);
+    } else {
+      setDetectingDuration(true);
+    }
+
+    try {
+      const audio = new Audio(url);
+      
+      audio.addEventListener('loadedmetadata', () => {
+        const durationInSeconds = Math.round(audio.duration);
+        
+        if (isEdit) {
+          setEditEpForm(f => ({ ...f, duration: durationInSeconds }));
+          setEditDetectingDuration(false);
+        } else {
+          setEpForm(f => ({ ...f, duration: durationInSeconds }));
+          setDetectingDuration(false);
+        }
+      });
+
+      audio.addEventListener('error', () => {
+        if (isEdit) {
+          setEditDetectingDuration(false);
+        } else {
+          setDetectingDuration(false);
+        }
+        setEpMsg("Không thể tải audio. Vui lòng nhập thời lượng thủ công.");
+      });
+
+      // Load the audio
+      audio.load();
+    } catch (error) {
+      if (isEdit) {
+        setEditDetectingDuration(false);
+      } else {
+        setDetectingDuration(false);
+      }
+      setEpMsg("Lỗi khi phát hiện thời lượng");
+    }
+  }
 
   async function loadEpisodes() {
     const eps = await fetch(`/api/admin/story/${storyId}/episodes`).then(r => r.json());
@@ -141,7 +189,17 @@ export default function EditStoryPage() {
                   <form onSubmit={handleUpdateEp} className="border-b border-[#2a2a4a] bg-[#0f0f23] p-3 space-y-2">
                     <div className="grid grid-cols-2 gap-2">
                       <input type="text" required value={editEpForm.title} onChange={e => setEditEpForm(f => ({ ...f, title: e.target.value }))} placeholder="Tiêu đề" className={ic} />
-                      <input type="url" required value={editEpForm.audioUrl} onChange={e => setEditEpForm(f => ({ ...f, audioUrl: e.target.value }))} placeholder="URL audio" className={ic} />
+                      <div className="flex gap-1">
+                        <input type="url" required value={editEpForm.audioUrl} onChange={e => setEditEpForm(f => ({ ...f, audioUrl: e.target.value }))} placeholder="URL audio" className={ic} />
+                        <button 
+                          type="button" 
+                          onClick={() => detectAudioDuration(editEpForm.audioUrl, true)}
+                          disabled={!editEpForm.audioUrl || editDetectingDuration}
+                          className="whitespace-nowrap rounded bg-blue-600 px-2 text-xs text-white hover:bg-blue-700 disabled:opacity-50"
+                        >
+                          {editDetectingDuration ? "..." : "TL"}
+                        </button>
+                      </div>
                       <input type="number" required min={1} value={editEpForm.order} onChange={e => setEditEpForm(f => ({ ...f, order: parseInt(e.target.value) || 1 }))} placeholder="Thứ tự" className={ic} />
                       <input type="number" required min={1} value={editEpForm.duration || ""} onChange={e => setEditEpForm(f => ({ ...f, duration: parseInt(e.target.value) || 0 }))} placeholder="Thời lượng (giây)" className={ic} />
                     </div>
@@ -175,9 +233,25 @@ export default function EditStoryPage() {
           <h3 className="text-sm font-medium text-gray-300">Thêm tập mới</h3>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div><label className="mb-1 block text-xs text-gray-400">Tiêu đề tập</label><input type="text" required value={epForm.title} onChange={e => setEpForm(f => ({ ...f, title: e.target.value }))} className={ic} /></div>
-            <div><label className="mb-1 block text-xs text-gray-400">URL audio</label><input type="url" required value={epForm.audioUrl} onChange={e => setEpForm(f => ({ ...f, audioUrl: e.target.value }))} className={ic} /></div>
+            <div>
+              <label className="mb-1 block text-xs text-gray-400">URL audio</label>
+              <div className="flex gap-2">
+                <input type="url" required value={epForm.audioUrl} onChange={e => setEpForm(f => ({ ...f, audioUrl: e.target.value }))} className={ic} />
+                <button 
+                  type="button" 
+                  onClick={() => detectAudioDuration(epForm.audioUrl, false)}
+                  disabled={!epForm.audioUrl || detectingDuration}
+                  className="whitespace-nowrap rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {detectingDuration ? "..." : "Lấy TL"}
+                </button>
+              </div>
+            </div>
             <div><label className="mb-1 block text-xs text-gray-400">Thứ tự</label><input type="number" required min={1} value={epForm.order} onChange={e => setEpForm(f => ({ ...f, order: parseInt(e.target.value) || 1 }))} className={ic} /></div>
-            <div><label className="mb-1 block text-xs text-gray-400">Thời lượng (giây)</label><input type="number" required min={1} value={epForm.duration || ""} onChange={e => setEpForm(f => ({ ...f, duration: parseInt(e.target.value) || 0 }))} className={ic} /></div>
+            <div>
+              <label className="mb-1 block text-xs text-gray-400">Thời lượng (giây) {epForm.duration > 0 && <span className="text-gray-500">≈ {Math.floor(epForm.duration / 60)} phút</span>}</label>
+              <input type="number" required min={1} value={epForm.duration || ""} onChange={e => setEpForm(f => ({ ...f, duration: parseInt(e.target.value) || 0 }))} className={ic} />
+            </div>
           </div>
           <label className="flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" checked={epForm.isFreePreview} onChange={e => setEpForm(f => ({ ...f, isFreePreview: e.target.checked }))} className="h-4 w-4 rounded" />Miễn phí (Free Preview)</label>
           {epMsg && <p className={`text-xs ${epMsg.startsWith("✓") ? "text-green-400" : "text-red-400"}`}>{epMsg}</p>}

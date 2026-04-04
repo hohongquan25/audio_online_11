@@ -48,7 +48,7 @@ export default async function StoriesPage({ searchParams }: Props) {
   const [stories, total, categories] = await Promise.all([
     prisma.story.findMany({
       where, skip, take: PAGE_SIZE, orderBy,
-      select: { slug: true, title: true, description: true, coverImage: true, isVip: true, avgRating: true, ratingCount: true, _count: { select: { episodes: true } } },
+      select: { slug: true, title: true, description: true, coverImage: true, isVip: true, avgRating: true, ratingCount: true, viewCount: true, status: true, _count: { select: { episodes: true } } },
     }),
     prisma.story.count({ where }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),

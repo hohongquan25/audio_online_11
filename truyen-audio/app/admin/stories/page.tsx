@@ -70,7 +70,8 @@ export default async function AdminStoriesPage({ searchParams }: Props) {
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Truyện</th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Danh mục</th>
                 <th className="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">VIP</th>
-                <th className="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">Trạng thái</th>
+                <th className="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">Trạng thái xuất bản</th>
+                <th className="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">Trạng thái truyện</th>
                 <th className="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">Tập</th>
                 <th className="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">Thao tác</th>
               </tr>
@@ -99,9 +100,16 @@ export default async function AdminStoriesPage({ searchParams }: Props) {
                       <span className="rounded-full bg-red-900/30 px-2 py-0.5 text-xs text-red-400">Tắt</span>
                     )}
                   </td>
+                  <td className="px-4 py-3 text-center">
+                    {story.status === "completed" ? (
+                      <span className="rounded-full bg-blue-900/30 px-2 py-0.5 text-xs text-blue-400">Hoàn thành</span>
+                    ) : (
+                      <span className="rounded-full bg-purple-900/30 px-2 py-0.5 text-xs text-purple-400">Đang cập nhật</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-center text-sm text-gray-400">{story._count.episodes}</td>
                   <td className="px-4 py-3 text-center">
-                    <AdminStoryActions storyId={story.id} isActive={story.isActive} slug={story.slug} />
+                    <AdminStoryActions storyId={story.id} isActive={story.isActive} slug={story.slug} status={story.status} />
                   </td>
                 </tr>
               ))}

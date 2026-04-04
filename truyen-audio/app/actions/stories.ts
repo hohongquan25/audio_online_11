@@ -86,6 +86,24 @@ export async function toggleStoryActive(storyId: string): Promise<ActionResult> 
   }
 }
 
+export async function updateStoryStatus(storyId: string, status: "ongoing" | "completed"): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, message: "Không có quyền" };
+
+  try {
+    await prisma.story.update({
+      where: { id: storyId },
+      data: { status },
+    });
+    revalidatePath("/admin/stories");
+    revalidatePath("/stories");
+    revalidatePath("/");
+    return { success: true, message: `Đã chuyển sang ${status === "completed" ? "Hoàn thành" : "Đang cập nhật"}` };
+  } catch (error) {
+    console.error("Error updating story status:", error);
+    return { success: false, message: "Đã xảy ra lỗi" };
+  }
+}
+
 export async function deleteStory(storyId: string): Promise<ActionResult> {
   if (!(await requireAdmin())) return { success: false, message: "Không có quyền" };
 
