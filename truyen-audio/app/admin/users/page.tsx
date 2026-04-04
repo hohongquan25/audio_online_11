@@ -16,7 +16,14 @@ export default async function AdminUsersPage({ searchParams }: Props) {
   const roleFilter = (params.role as string) || "";
 
   const where = {
-    ...(search ? { email: { contains: search, mode: "insensitive" as const } } : {}),
+    ...(search
+      ? {
+          OR: [
+            { email: { contains: search, mode: "insensitive" as const } },
+            { code: { contains: search, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
     ...(roleFilter ? { role: roleFilter as "USER" | "VIP" | "ADMIN" } : {}),
   };
 
@@ -35,6 +42,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
         role: true,
         isBanned: true,
         vipExpiredAt: true,
+        code: true,
         createdAt: true,
         _count: { select: { payments: true, listeningHistory: true } },
       },
@@ -57,7 +65,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
           <input
             name="search"
             defaultValue={search}
-            placeholder="Tìm theo email..."
+            placeholder="Tìm theo email hoặc code..."
             className="rounded-lg border border-[#2a2a4a] bg-[#1a1a2e] px-4 py-2 text-sm text-gray-300 placeholder-gray-600 focus:border-purple-500 focus:outline-none sm:w-64"
           />
           {roleFilter && <input type="hidden" name="role" value={roleFilter} />}
@@ -89,6 +97,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
             <thead className="bg-[#1a1a2e]">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Email</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Code</th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Tên</th>
                 <th className="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">Role</th>
                 <th className="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">VIP hết hạn</th>
@@ -102,6 +111,15 @@ export default async function AdminUsersPage({ searchParams }: Props) {
               {users.map((user) => (
                 <tr key={user.id}>
                   <td className="px-4 py-3 text-sm text-gray-200">{user.email}</td>
+                  <td className="px-4 py-3 text-sm">
+                    {user.code ? (
+                      <span className="rounded bg-purple-900/30 px-2 py-0.5 font-mono text-xs text-purple-300">
+                        {user.code}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-600">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-sm text-gray-400">{user.name || "—"}</td>
                   <td className="px-4 py-3 text-center">
                     <RoleBadge role={user.role} />
