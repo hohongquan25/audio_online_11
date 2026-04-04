@@ -13,10 +13,12 @@ export default function GlobalAudioPlayer() {
       <div className="h-16" />
       <div className="fixed bottom-0 left-0 right-0 z-50">
         <AudioPlayer
+          key={state.episode.id}
           episode={state.episode}
           initialProgress={state.initialProgress}
           isPreviewOnly={state.isPreviewOnly}
           isLoggedIn={state.isLoggedIn}
+          nextEpisode={state.nextEpisode}
         />
         <button
           onClick={stop}

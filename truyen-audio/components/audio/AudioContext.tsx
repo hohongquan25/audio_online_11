@@ -15,16 +15,28 @@ interface AudioState {
   initialProgress: number;
   isPreviewOnly: boolean;
   isLoggedIn: boolean;
+  nextEpisode: { id: string; title: string; audioUrl: string; duration: number } | null;
+  allEpisodes: Array<{ id: string; title: string; audioUrl: string; duration: number; order: number; isFreePreview: boolean }>;
+  storyIsVip: boolean;
+  userIsVip: boolean;
 }
 
 interface AudioContextType {
   state: AudioState;
-  play: (episode: EpisodeData, opts?: { initialProgress?: number; isPreviewOnly?: boolean; isLoggedIn?: boolean }) => void;
+  play: (episode: EpisodeData, opts?: { 
+    initialProgress?: number; 
+    isPreviewOnly?: boolean; 
+    isLoggedIn?: boolean; 
+    nextEpisode?: { id: string; title: string; audioUrl: string; duration: number } | null;
+    allEpisodes?: Array<{ id: string; title: string; audioUrl: string; duration: number; order: number; isFreePreview: boolean }>;
+    storyIsVip?: boolean;
+    userIsVip?: boolean;
+  }) => void;
   stop: () => void;
 }
 
 const AudioCtx = createContext<AudioContextType>({
-  state: { episode: null, initialProgress: 0, isPreviewOnly: false, isLoggedIn: false },
+  state: { episode: null, initialProgress: 0, isPreviewOnly: false, isLoggedIn: false, nextEpisode: null, allEpisodes: [], storyIsVip: false, userIsVip: false },
   play: () => {},
   stop: () => {},
 });
@@ -39,19 +51,35 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     initialProgress: 0,
     isPreviewOnly: false,
     isLoggedIn: false,
+    nextEpisode: null,
+    allEpisodes: [],
+    storyIsVip: false,
+    userIsVip: false,
   });
 
-  function play(episode: EpisodeData, opts?: { initialProgress?: number; isPreviewOnly?: boolean; isLoggedIn?: boolean }) {
+  function play(episode: EpisodeData, opts?: { 
+    initialProgress?: number; 
+    isPreviewOnly?: boolean; 
+    isLoggedIn?: boolean; 
+    nextEpisode?: { id: string; title: string; audioUrl: string; duration: number } | null;
+    allEpisodes?: Array<{ id: string; title: string; audioUrl: string; duration: number; order: number; isFreePreview: boolean }>;
+    storyIsVip?: boolean;
+    userIsVip?: boolean;
+  }) {
     setState({
       episode,
       initialProgress: opts?.initialProgress ?? 0,
       isPreviewOnly: opts?.isPreviewOnly ?? false,
       isLoggedIn: opts?.isLoggedIn ?? false,
+      nextEpisode: opts?.nextEpisode ?? null,
+      allEpisodes: opts?.allEpisodes ?? [],
+      storyIsVip: opts?.storyIsVip ?? false,
+      userIsVip: opts?.userIsVip ?? false,
     });
   }
 
   function stop() {
-    setState({ episode: null, initialProgress: 0, isPreviewOnly: false, isLoggedIn: false });
+    setState({ episode: null, initialProgress: 0, isPreviewOnly: false, isLoggedIn: false, nextEpisode: null, allEpisodes: [], storyIsVip: false, userIsVip: false });
   }
 
   return (

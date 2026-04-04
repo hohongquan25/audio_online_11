@@ -46,10 +46,43 @@ export default function EpisodeList({ episodes, userRole, storyIsVip, storyTitle
       else setModalType("vip");
       return;
     }
+    
     if (episode.audioUrl && storyTitle && storySlug) {
+      // Find next episode
+      const currentIndex = episodes.findIndex(ep => ep.id === episode.id);
+      const nextEp = currentIndex >= 0 && currentIndex < episodes.length - 1 ? episodes[currentIndex + 1] : null;
+      
+      // Check if next episode is accessible
+      let nextEpisodeAccessible: { id: string; title: string; audioUrl: string; duration: number } | null = null;
+      if (nextEp && canPlay(nextEp) && nextEp.audioUrl) {
+        nextEpisodeAccessible = {
+          id: nextEp.id,
+          title: nextEp.title,
+          audioUrl: nextEp.audioUrl,
+          duration: nextEp.duration
+        };
+      }
+      
+      // Prepare allEpisodes with order info
+      const allEpisodesWithOrder = episodes.map(ep => ({
+        id: ep.id,
+        title: ep.title,
+        audioUrl: ep.audioUrl || '',
+        duration: ep.duration,
+        order: ep.order,
+        isFreePreview: ep.isFreePreview
+      }));
+      
       play(
         { id: episode.id, title: episode.title, audioUrl: episode.audioUrl, duration: episode.duration, story: { title: storyTitle, slug: storySlug } },
-        { isPreviewOnly: !isLoggedIn && episode.isFreePreview, isLoggedIn }
+        { 
+          isPreviewOnly: !isLoggedIn && episode.isFreePreview, 
+          isLoggedIn, 
+          nextEpisode: nextEpisodeAccessible,
+          allEpisodes: allEpisodesWithOrder,
+          storyIsVip: storyIsVip,
+          userIsVip: isVip
+        }
       );
     } else {
       router.push(`/listen/${episode.id}`);

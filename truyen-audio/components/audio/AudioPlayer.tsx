@@ -1,8 +1,10 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { formatDuration } from "@/lib/utils";
 import { saveProgress } from "@/app/actions/listening";
+import { useAudio } from "./AudioContext";
 
 interface AudioPlayerProps {
   episode: {
@@ -15,13 +17,21 @@ interface AudioPlayerProps {
   initialProgress?: number;
   isPreviewOnly?: boolean;
   isLoggedIn?: boolean;
+  nextEpisode?: { 
+    id: string; 
+    title: string;
+    audioUrl: string;
+    duration: number;
+  } | null;
 }
 
 const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 2];
 const PREVIEW_LIMIT = 300;
 const SAVE_INTERVAL = 10_000;
 
-export default function AudioPlayer({ episode, initialProgress = 0, isPreviewOnly = false, isLoggedIn = false }: AudioPlayerProps) {
+export default function AudioPlayer({ episode, initialProgress = 0, isPreviewOnly = false, isLoggedIn = false, nextEpisode = null }: AudioPlayerProps) {
+  const router = useRouter();
+  const { play, state } = useAudio();
   const audioRef = useRef<HTMLAudioElement>(null);
   const saveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastSavedRef = useRef<number>(initialProgress);
@@ -44,6 +54,57 @@ export default function AudioPlayer({ episode, initialProgress = 0, isPreviewOnl
     lastSavedRef.current = rounded;
     await saveProgress(episode.id, rounded);
   }, [isLoggedIn, episode.id]);
+
+  const handleEnded = useCallback(() => { 
+    setIsPlaying(false); 
+    const a = audioRef.current; 
+    if (a) doSaveProgress(a.currentTime);
+    
+    // Don't auto-play if in preview mode
+    if (isPreviewOnly) return;
+    
+    // Auto-play next episode if available
+    if (nextEpisode) {
+      // Calculate the next-next episode from allEpisodes
+      const allEps = state.allEpisodes;
+      const currentIndex = allEps.findIndex(ep => ep.id === nextEpisode.id);
+      const nextNextEp = currentIndex >= 0 && currentIndex < allEps.length - 1 ? allEps[currentIndex + 1] : null;
+      
+      // Check if next-next episode is accessible
+      let nextNextEpisodeAccessible: { id: string; title: string; audioUrl: string; duration: number } | null = null;
+      if (nextNextEp) {
+        const canAccess = nextNextEp.isFreePreview || !state.storyIsVip || state.userIsVip;
+        if (canAccess) {
+          nextNextEpisodeAccessible = {
+            id: nextNextEp.id,
+            title: nextNextEp.title,
+            audioUrl: nextNextEp.audioUrl,
+            duration: nextNextEp.duration
+          };
+        }
+      }
+      
+      // Play next episode directly without page navigation
+      play(
+        { 
+          id: nextEpisode.id, 
+          title: nextEpisode.title, 
+          audioUrl: nextEpisode.audioUrl, 
+          duration: nextEpisode.duration, 
+          story: episode.story 
+        },
+        { 
+          initialProgress: 0, 
+          isPreviewOnly: false, 
+          isLoggedIn,
+          nextEpisode: nextNextEpisodeAccessible,
+          allEpisodes: state.allEpisodes,
+          storyIsVip: state.storyIsVip,
+          userIsVip: state.userIsVip
+        }
+      );
+    }
+  }, [nextEpisode, play, episode.story, isLoggedIn, doSaveProgress, isPreviewOnly, state.allEpisodes, state.storyIsVip, state.userIsVip]);
 
   // Auto-seek to saved position and auto-play on mount
   useEffect(() => {
@@ -136,13 +197,22 @@ export default function AudioPlayer({ episode, initialProgress = 0, isPreviewOnl
 
   // Cleanup sleep timer on unmount
   useEffect(() => () => { if (sleepTimerRef.current) clearInterval(sleepTimerRef.current); }, []);
-  const handleEnded = () => { setIsPlaying(false); const a = audioRef.current; if (a) doSaveProgress(a.currentTime); };
 
   const pct = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
     <div className="bg-[#111] border-t border-[#333] w-full">
-      <audio ref={audioRef} src={episode.audioUrl} preload="metadata" onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onPause={handlePause} onPlay={handlePlay} onEnded={handleEnded} />
+      <audio 
+        key={episode.id}
+        ref={audioRef} 
+        src={episode.audioUrl} 
+        preload="metadata" 
+        onTimeUpdate={handleTimeUpdate} 
+        onLoadedMetadata={handleLoadedMetadata} 
+        onPause={handlePause} 
+        onPlay={handlePlay} 
+        onEnded={handleEnded} 
+      />
 
       {/* Progress bar — full width thin line at top */}
       <div className="h-1 cursor-pointer bg-[#333] touch-manipulation" onClick={handleSeek} style={{ touchAction: 'manipulation' }}>

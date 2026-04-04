@@ -14,17 +14,16 @@ interface Props {
   initialProgress: number;
   isPreviewOnly: boolean;
   isLoggedIn: boolean;
+  nextEpisode: { id: string; title: string; audioUrl: string; duration: number } | null;
 }
 
-export default function ListenClient({ episode, initialProgress, isPreviewOnly, isLoggedIn }: Props) {
+export default function ListenClient({ episode, initialProgress, isPreviewOnly, isLoggedIn, nextEpisode }: Props) {
   const { play, state } = useAudio();
 
   useEffect(() => {
-    // Auto-play when page loads, but only if not already playing this episode
-    if (state.episode?.id !== episode.id) {
-      play(episode, { initialProgress, isPreviewOnly, isLoggedIn });
-    }
-  }, [episode.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    // Always update when episode changes
+    play(episode, { initialProgress, isPreviewOnly, isLoggedIn, nextEpisode });
+  }, [episode.id, nextEpisode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
 }
