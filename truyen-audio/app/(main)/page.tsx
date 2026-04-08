@@ -84,7 +84,7 @@ export default async function HomePage() {
         {/* Categories from DB */}
         {categories.length > 0 && (
           <div className="mb-10 flex flex-wrap justify-center gap-2">
-            {categories.map((cat) => (
+            {categories.map((cat: { id: string; name: string; slug: string; emoji: string | null }) => (
               <Link 
                 key={cat.id} 
                 href={`/stories?category=${cat.slug}`}
