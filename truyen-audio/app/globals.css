@@ -34,6 +34,11 @@ body {
   color: var(--text-primary);
   font-family: Arial, Helvetica, sans-serif;
   transition: background-color 0.3s, color 0.3s;
+  pointer-events: auto;
+}
+
+main {
+  pointer-events: auto;
 }
 
 /* iOS Safari touch fixes */
@@ -45,6 +50,7 @@ button, a, [role="button"], input[type="submit"] {
   -webkit-tap-highlight-color: rgba(124, 58, 237, 0.2);
   cursor: pointer;
   touch-action: manipulation;
+  pointer-events: auto;
 }
 
 button, input[type="submit"] {

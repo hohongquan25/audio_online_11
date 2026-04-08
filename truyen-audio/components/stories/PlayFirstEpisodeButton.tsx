@@ -33,6 +33,15 @@ export default function PlayFirstEpisodeButton({ firstEpisode, storyTitle, story
   // Can play if: free preview OR story is not VIP OR user is VIP
   const canPlay = firstEpisode.isFreePreview || !storyIsVip || isVip;
 
+  // Store episode data to avoid null reference issues
+  const episodeData = {
+    id: firstEpisode.id,
+    title: firstEpisode.title,
+    audioUrl: firstEpisode.audioUrl,
+    duration: firstEpisode.duration,
+    isFreePreview: firstEpisode.isFreePreview
+  };
+
   function handleClick() {
     if (!canPlay) {
       setShowVipModal(true);
@@ -40,8 +49,8 @@ export default function PlayFirstEpisodeButton({ firstEpisode, storyTitle, story
     }
 
     play(
-      { id: firstEpisode.id, title: firstEpisode.title, audioUrl: firstEpisode.audioUrl, duration: firstEpisode.duration, story: { title: storyTitle, slug: storySlug } },
-      { isPreviewOnly: !isLoggedIn && firstEpisode.isFreePreview, isLoggedIn }
+      { id: episodeData.id, title: episodeData.title, audioUrl: episodeData.audioUrl, duration: episodeData.duration, story: { title: storyTitle, slug: storySlug } },
+      { isPreviewOnly: !isLoggedIn && episodeData.isFreePreview, isLoggedIn }
     );
   }
 
@@ -49,9 +58,10 @@ export default function PlayFirstEpisodeButton({ firstEpisode, storyTitle, story
     <>
       <button
         onClick={handleClick}
+        style={{ touchAction: 'manipulation', pointerEvents: 'auto', minHeight: '44px' }}
         className="flex items-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-600/25 hover:bg-purple-700"
       >
-        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" style={{ pointerEvents: 'none' }}><path d="M8 5v14l11-7z" /></svg>
         Nghe thử
       </button>
 
@@ -61,11 +71,11 @@ export default function PlayFirstEpisodeButton({ firstEpisode, storyTitle, story
           Truyện này yêu cầu gói VIP để nghe. Nâng cấp ngay để trải nghiệm không giới hạn.
         </p>
         <div className="flex gap-3">
-          <Link href="/vip" className="inline-block rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700">
+          <Link href="/vip" style={{ touchAction: 'manipulation' }} className="inline-block rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700">
             Xem gói VIP
           </Link>
           {!isLoggedIn && (
-            <Link href="/login" className="inline-block rounded-lg border border-[#2a2a4a] px-4 py-2 text-sm font-medium text-gray-300 hover:text-white">
+            <Link href="/login" style={{ touchAction: 'manipulation' }} className="inline-block rounded-lg border border-[#2a2a4a] px-4 py-2 text-sm font-medium text-gray-300 hover:text-white">
               Đăng nhập
             </Link>
           )}

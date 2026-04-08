@@ -103,6 +103,7 @@ export default function EpisodeList({ episodes, userRole, storyIsVip, storyTitle
               <button
                 type="button"
                 onClick={() => handlePlay(episode)}
+                style={{ touchAction: 'manipulation', pointerEvents: 'auto', minHeight: '56px' }}
                 className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all ${
                   isCurrentlyPlaying
                     ? "bg-purple-600/10 border border-purple-600/30"
@@ -166,12 +167,12 @@ export default function EpisodeList({ episodes, userRole, storyIsVip, storyTitle
 
       <Modal isOpen={modalType === "login"} onClose={() => setModalType(null)} title="Yêu cầu đăng nhập">
         <p className="mb-4 text-sm text-gray-400">Vui lòng đăng nhập để nghe tập này.</p>
-        <Link href="/login" className="inline-block rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700">Đăng nhập</Link>
+        <Link href="/login" style={{ touchAction: 'manipulation', pointerEvents: 'auto' }} className="inline-block rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700">Đăng nhập</Link>
       </Modal>
 
       <Modal isOpen={modalType === "vip"} onClose={() => setModalType(null)} title="Nâng cấp VIP">
         <p className="mb-4 text-sm text-gray-400">Nâng cấp VIP để nghe tất cả các tập truyện.</p>
-        <Link href="/vip" className="inline-block rounded-lg bg-yellow-500 px-4 py-2 text-sm font-medium text-white hover:bg-yellow-600">Nâng cấp VIP</Link>
+        <Link href="/vip" style={{ touchAction: 'manipulation', pointerEvents: 'auto' }} className="inline-block rounded-lg bg-yellow-500 px-4 py-2 text-sm font-medium text-white hover:bg-yellow-600">Nâng cấp VIP</Link>
       </Modal>
     </>
   );

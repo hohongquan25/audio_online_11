@@ -34,8 +34,8 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--bg-card-border)] bg-[var(--bg-primary)] shadow-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8" style={{ position: 'relative', zIndex: 1 }}>
+    <header className="sticky top-0 z-[60] border-b border-[var(--bg-card-border)] bg-[var(--bg-primary)] shadow-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-2xl">🎧</span>
           <span className="text-xl font-bold text-white">TruyệnAudio</span>
@@ -47,6 +47,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
+              style={{ touchAction: 'manipulation' }}
               className={cn(
                 "flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition",
                 isActive(link.href)
@@ -59,10 +60,14 @@ export default function Header() {
             </Link>
           ))}
           {isAdmin && (
-            <Link href="/admin" className={cn(
-              "flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition",
-              pathname.startsWith("/admin") ? "bg-red-600/20 text-red-300" : "text-red-400 hover:bg-[#1a1a2e] hover:text-red-300"
-            )}>
+            <Link 
+              href="/admin" 
+              style={{ touchAction: 'manipulation' }} 
+              className={cn(
+                "flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition",
+                pathname.startsWith("/admin") ? "bg-red-600/20 text-red-300" : "text-red-400 hover:bg-[#1a1a2e] hover:text-red-300"
+              )}
+            >
               <span className="text-base">⚙️</span>
               <span>Admin</span>
             </Link>
@@ -76,7 +81,11 @@ export default function Header() {
             <span className="h-8 w-20 animate-pulse rounded bg-[#2a2a4a]" />
           ) : user ? (
             <>
-              <Link href="/profile" className="flex items-center gap-2 text-sm text-gray-300 hover:text-white">
+              <Link 
+                href="/profile" 
+                style={{ touchAction: 'manipulation' }} 
+                className="flex items-center gap-2 text-sm text-gray-300 hover:text-white"
+              >
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-600 text-sm font-medium text-white">
                   {(user.email?.[0] ?? "U").toUpperCase()}
                 </span>
@@ -84,8 +93,20 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link href="/login" className="text-sm text-gray-400 hover:text-white">Đăng nhập</Link>
-              <Link href="/register" className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700">Đăng ký</Link>
+              <Link 
+                href="/login" 
+                style={{ touchAction: 'manipulation' }} 
+                className="text-sm text-gray-400 hover:text-white"
+              >
+                Đăng nhập
+              </Link>
+              <Link 
+                href="/register" 
+                style={{ touchAction: 'manipulation' }} 
+                className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+              >
+                Đăng ký
+              </Link>
             </>
           )}
         </div>
@@ -105,7 +126,7 @@ export default function Header() {
               justifyContent: 'center',
               cursor: 'pointer',
               position: 'relative',
-              zIndex: 9999
+              pointerEvents: 'auto'
             }}
             aria-label="Menu"
           >
@@ -122,25 +143,63 @@ export default function Header() {
       <div className={cn("border-t border-[#2a2a4a] md:hidden", mobileOpen ? "block" : "hidden")}>
         <nav className="space-y-1 px-4 py-3">
           {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}
-              className={cn("flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium", isActive(link.href) ? "bg-purple-600/20 text-purple-300" : "text-gray-400 hover:bg-[#1a1a2e] hover:text-white")}>
-              <span>{link.icon}</span><span>{link.label}</span>
+            <Link 
+              key={link.href} 
+              href={link.href} 
+              onClick={() => setMobileOpen(false)}
+              style={{ touchAction: 'manipulation' }}
+              className={cn(
+                "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium", 
+                isActive(link.href) 
+                  ? "bg-purple-600/20 text-purple-300" 
+                  : "text-gray-400 hover:bg-[#1a1a2e] hover:text-white"
+              )}
+            >
+              <span>{link.icon}</span>
+              <span>{link.label}</span>
             </Link>
           ))}
         </nav>
         <div className="border-t border-[#2a2a4a] px-4 py-3">
           {user ? (
             <div className="space-y-2">
-              <Link href="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-300 hover:bg-[#1a1a2e]">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-600 text-sm font-medium text-white">{(user.email?.[0] ?? "U").toUpperCase()}</span>
+              <Link 
+                href="/profile" 
+                onClick={() => setMobileOpen(false)} 
+                style={{ touchAction: 'manipulation' }} 
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-300 hover:bg-[#1a1a2e]"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-600 text-sm font-medium text-white">
+                  {(user.email?.[0] ?? "U").toUpperCase()}
+                </span>
                 <span className="truncate">{user.email}</span>
               </Link>
-              <button onClick={() => { setMobileOpen(false); signOut({ callbackUrl: "/" }); }} className="w-full rounded-lg bg-[#2a2a4a] px-3 py-2 text-left text-sm text-gray-300 hover:bg-[#3a3a5a]">Đăng xuất</button>
+              <button 
+                onClick={() => { setMobileOpen(false); signOut({ callbackUrl: "/" }); }} 
+                style={{ touchAction: 'manipulation', pointerEvents: 'auto' }} 
+                className="w-full rounded-lg bg-[#2a2a4a] px-3 py-2 text-left text-sm text-gray-300 hover:bg-[#3a3a5a]"
+              >
+                Đăng xuất
+              </button>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-center text-sm text-gray-300 hover:bg-[#1a1a2e]">Đăng nhập</Link>
-              <Link href="/register" onClick={() => setMobileOpen(false)} className="rounded-lg bg-purple-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-700">Đăng ký</Link>
+              <Link 
+                href="/login" 
+                onClick={() => setMobileOpen(false)} 
+                style={{ touchAction: 'manipulation' }} 
+                className="rounded-lg px-3 py-2 text-center text-sm text-gray-300 hover:bg-[#1a1a2e]"
+              >
+                Đăng nhập
+              </Link>
+              <Link 
+                href="/register" 
+                onClick={() => setMobileOpen(false)} 
+                style={{ touchAction: 'manipulation' }} 
+                className="rounded-lg bg-purple-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-700"
+              >
+                Đăng ký
+              </Link>
             </div>
           )}
         </div>

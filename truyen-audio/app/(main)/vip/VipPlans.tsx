@@ -82,10 +82,11 @@ export default function VipPlans({ user, plans, qrInfo }: Props) {
           {msg && <p className="mb-3 rounded-lg bg-green-900/20 p-2 text-center text-sm text-green-300">{msg}</p>}
 
           <button onClick={handleConfirm} disabled={loading}
+            style={{ touchAction: 'manipulation', pointerEvents: 'auto', minHeight: '48px' }}
             className="w-full rounded-xl bg-purple-600 py-3 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-50">
             {loading ? "Đang xử lý..." : "✓ Tôi đã chuyển khoản"}
           </button>
-          <button onClick={() => setStep("select")} className="mt-2 w-full rounded-xl border border-[#2a2a4a] py-2 text-sm text-gray-400 hover:text-white">
+          <button onClick={() => setStep("select")} style={{ touchAction: 'manipulation', pointerEvents: 'auto', minHeight: '48px' }} className="mt-2 w-full rounded-xl border border-[#2a2a4a] py-2 text-sm text-gray-400 hover:text-white">
             Quay lại
           </button>
         </div>
@@ -99,7 +100,7 @@ export default function VipPlans({ user, plans, qrInfo }: Props) {
         <div className="mb-3 text-4xl">⏳</div>
         <h2 className="text-xl font-bold text-purple-300">Đang chờ xác nhận</h2>
         <p className="mt-2 text-gray-400">{msg || "Admin sẽ xác nhận và cấp VIP cho bạn trong vòng 24h."}</p>
-        <button onClick={() => setStep("select")} className="mt-4 rounded-xl border border-[#2a2a4a] px-6 py-2 text-sm text-gray-400 hover:text-white">
+        <button onClick={() => setStep("select")} style={{ touchAction: 'manipulation', pointerEvents: 'auto', minHeight: '48px' }} className="mt-4 rounded-xl border border-[#2a2a4a] px-6 py-2 text-sm text-gray-400 hover:text-white">
           Xem các gói khác
         </button>
       </div>
@@ -128,6 +129,7 @@ export default function VipPlans({ user, plans, qrInfo }: Props) {
                   {BENEFITS.map(b => <li key={b} className="flex items-center gap-2"><span className="text-green-400">✓</span>{b}</li>)}
                 </ul>
                 <button onClick={() => handleSelectPlan(plan)}
+                  style={{ touchAction: 'manipulation', pointerEvents: 'auto', minHeight: '48px' }}
                   className={`w-full rounded-xl py-3 text-sm font-semibold text-white transition ${isPopular ? "bg-purple-600 hover:bg-purple-700" : "bg-[#2a2a4a] hover:bg-purple-600"}`}>
                   Đăng ký ngay
                 </button>

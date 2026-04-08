@@ -91,7 +91,9 @@ export default function LoginForm() {
         style={{ 
           minHeight: '48px',
           position: 'relative',
-          zIndex: 10
+          zIndex: 10,
+          touchAction: 'manipulation',
+          pointerEvents: 'auto'
         }}
       >
         {loading ? "Đang xử lý..." : "Đăng nhập"}

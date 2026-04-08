@@ -239,13 +239,14 @@ export default function AudioPlayer({ episode, initialProgress = 0, isPreviewOnl
         <div className="flex items-center gap-1">
           {/* Speed */}
           <div className="relative">
-            <button onClick={() => setShowSpeed(!showSpeed)} className="rounded px-2 py-1 text-xs text-gray-400 hover:text-white">
+            <button onClick={() => setShowSpeed(!showSpeed)} className="rounded px-2 py-1 text-xs text-gray-400 hover:text-white" style={{ touchAction: 'manipulation', pointerEvents: 'auto', minWidth: '44px', minHeight: '44px' }}>
               ⏱ {playbackRate}x
             </button>
             {showSpeed && (
               <div className="absolute bottom-full right-0 mb-1 rounded-lg border border-[#333] bg-[#1a1a1a] p-1 shadow-xl">
                 {PLAYBACK_RATES.map((r) => (
                   <button key={r} onClick={() => changeRate(r)}
+                    style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
                     className={`block w-full rounded px-3 py-1 text-left text-xs ${r === playbackRate ? "bg-purple-600 text-white" : "text-gray-300 hover:bg-[#333]"}`}>
                     {r}x
                   </button>
@@ -255,45 +256,45 @@ export default function AudioPlayer({ episode, initialProgress = 0, isPreviewOnl
           </div>
 
           {/* Repeat placeholder */}
-          <button className="rounded p-1.5 text-gray-500 hover:text-white" aria-label="Lặp lại">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <button className="rounded p-1.5 text-gray-500 hover:text-white" style={{ touchAction: 'manipulation', pointerEvents: 'auto', minWidth: '44px', minHeight: '44px' }} aria-label="Lặp lại">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ pointerEvents: 'none' }}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </button>
 
           {/* Skip back */}
-          <button onClick={skipBackward} className="rounded p-2 text-gray-400 hover:text-white active:text-purple-400 touch-manipulation" style={{ WebkitTapHighlightColor: 'rgba(124, 58, 237, 0.2)', touchAction: 'manipulation', minWidth: '44px', minHeight: '44px' }} aria-label="Tua lùi 15s">
-            <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <button onClick={skipBackward} className="rounded p-2 text-gray-400 hover:text-white active:text-purple-400 touch-manipulation" style={{ WebkitTapHighlightColor: 'rgba(124, 58, 237, 0.2)', touchAction: 'manipulation', minWidth: '44px', minHeight: '44px', pointerEvents: 'auto' }} aria-label="Tua lùi 15s">
+            <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ pointerEvents: 'none' }}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
             </svg>
           </button>
 
           {/* Play/Pause */}
           <button onClick={togglePlay} disabled={previewLimitReached}
-            className="flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 active:bg-purple-800 touch-manipulation" 
-            style={{ WebkitTapHighlightColor: 'rgba(124, 58, 237, 0.3)', touchAction: 'manipulation' }}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 active:bg-purple-800 touch-manipulation" 
+            style={{ WebkitTapHighlightColor: 'rgba(124, 58, 237, 0.3)', touchAction: 'manipulation', pointerEvents: 'auto' }}
             aria-label={isPlaying ? "Tạm dừng" : "Phát"}>
             {isPlaying ? (
-              <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" /></svg>
+              <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="currentColor" viewBox="0 0 24 24" style={{ pointerEvents: 'none' }}><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" /></svg>
             ) : (
-              <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+              <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="currentColor" viewBox="0 0 24 24" style={{ pointerEvents: 'none' }}><path d="M8 5v14l11-7z" /></svg>
             )}
           </button>
 
           {/* Skip forward */}
-          <button onClick={skipForward} className="rounded p-2 text-gray-400 hover:text-white active:text-purple-400 touch-manipulation" style={{ WebkitTapHighlightColor: 'rgba(124, 58, 237, 0.2)', touchAction: 'manipulation', minWidth: '44px', minHeight: '44px' }} aria-label="Tua tiến 15s">
-            <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <button onClick={skipForward} className="rounded p-2 text-gray-400 hover:text-white active:text-purple-400 touch-manipulation" style={{ WebkitTapHighlightColor: 'rgba(124, 58, 237, 0.2)', touchAction: 'manipulation', minWidth: '44px', minHeight: '44px', pointerEvents: 'auto' }} aria-label="Tua tiến 15s">
+            <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ pointerEvents: 'none' }}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
             </svg>
           </button>
 
           {/* Volume */}
           <div className="ml-2 flex items-center gap-1">
-            <button onClick={toggleMute} className="rounded p-1 text-gray-400 hover:text-white" aria-label={volume === 0 ? "Bật âm" : "Tắt âm"}>
+            <button onClick={toggleMute} className="rounded p-1 text-gray-400 hover:text-white" style={{ touchAction: 'manipulation', pointerEvents: 'auto', minWidth: '44px', minHeight: '44px' }} aria-label={volume === 0 ? "Bật âm" : "Tắt âm"}>
               {volume === 0 ? (
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ pointerEvents: 'none' }}><path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
               ) : (
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ pointerEvents: 'none' }}><path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
               )}
             </button>
             <input type="range" min="0" max="1" step="0.05" value={volume}
@@ -307,9 +308,10 @@ export default function AudioPlayer({ episode, initialProgress = 0, isPreviewOnl
             <button
               onClick={() => setShowSleep(!showSleep)}
               className={`flex items-center gap-1 rounded px-2 py-1 text-xs transition ${sleepTimer ? "text-purple-400" : "text-gray-400 hover:text-white"}`}
+              style={{ touchAction: 'manipulation', pointerEvents: 'auto', minWidth: '44px', minHeight: '44px' }}
               aria-label="Hẹn giờ tắt"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ pointerEvents: 'none' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               {sleepTimer && <span>{sleepTimer}p</span>}
@@ -322,6 +324,7 @@ export default function AudioPlayer({ episode, initialProgress = 0, isPreviewOnl
                 <div className="mb-3 grid grid-cols-4 gap-1">
                   {[15, 30, 45, 60].map(m => (
                     <button key={m} onClick={() => startSleepTimer(m)}
+                      style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
                       className={`rounded-lg py-1.5 text-xs font-medium transition ${sleepTimer === m ? "bg-purple-600 text-white" : "bg-[#222] text-gray-300 hover:bg-[#333]"}`}>
                       {m}p
                     </button>
@@ -346,6 +349,7 @@ export default function AudioPlayer({ episode, initialProgress = 0, isPreviewOnl
                 {/* Cancel */}
                 {sleepTimer && (
                   <button onClick={cancelSleepTimer}
+                    style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
                     className="mt-2 w-full rounded-lg bg-red-900/30 py-1.5 text-xs text-red-400 hover:bg-red-900/50">
                     Hủy ({sleepTimer}p còn lại)
                   </button>
