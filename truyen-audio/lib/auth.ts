@@ -11,18 +11,18 @@ declare module "next-auth" {
       email: string;
       role: "USER" | "VIP" | "ADMIN";
       vipExpiredAt: Date | null;
-      code: string;
+      code: string | null;
     };
   }
 }
 
-declare module "@auth/core/jwt" {
+declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     email: string;
     role: "USER" | "VIP" | "ADMIN";
     vipExpiredAt: Date | null;
-    code: string;
+    code: string | null;
   }
 }
 
@@ -110,10 +110,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.email = token.email as string;
-      session.user.role = token.role;
-      session.user.vipExpiredAt = token.vipExpiredAt;
+      session.user.id = (token.id as string) || "";
+      session.user.email = (token.email as string) || "";
+      session.user.role = (token.role as any) || "USER";
+      session.user.vipExpiredAt = (token.vipExpiredAt as any) || null;
       session.user.code = token.code;
       return session;
     },

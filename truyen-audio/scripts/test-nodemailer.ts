@@ -11,7 +11,6 @@ console.log('🔍 Testing nodemailer import and configuration...\n');
 try {
   // Test 1: Import successful
   console.log('✅ nodemailer imported successfully');
-  console.log(`   Version: ${nodemailer.name || 'nodemailer'}`);
 
   // Test 2: Create transporter with SMTP config
   const transporter = nodemailer.createTransport({

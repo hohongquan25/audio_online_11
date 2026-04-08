@@ -9,6 +9,9 @@ interface Story {
   isVip: boolean;
   avgRating: number;
   ratingCount: number;
+  viewCount: number;
+  status: string;
+  _count?: { episodes: number };
 }
 
 interface StoryGridProps {
