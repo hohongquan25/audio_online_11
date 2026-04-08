@@ -84,9 +84,12 @@ export default async function HomePage() {
         {/* Categories from DB */}
         {categories.length > 0 && (
           <div className="mb-10 flex flex-wrap justify-center gap-2">
-            {categories.map((cat: (typeof categories)[number]) => (
-              <Link key={cat.id} href={`/stories?category=${cat.slug}`}
-                className="flex items-center gap-1.5 rounded-full border border-[#2a2a4a] bg-[#1a1a2e] px-4 py-2 text-sm text-gray-300 transition hover:border-purple-500/50 hover:bg-purple-600/10 hover:text-white">
+            {categories.map((cat) => (
+              <Link 
+                key={cat.id} 
+                href={`/stories?category=${cat.slug}`}
+                className="flex items-center gap-1.5 rounded-full border border-[#2a2a4a] bg-[#1a1a2e] px-4 py-2 text-sm text-gray-300 transition hover:border-purple-500/50 hover:bg-purple-600/10 hover:text-white"
+              >
                 <span>{cat.emoji}</span><span>{cat.name}</span>
               </Link>
             ))}
