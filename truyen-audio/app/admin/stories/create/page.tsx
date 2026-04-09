@@ -11,6 +11,36 @@ export default function AdminCreateStoryPage() {
   const [storyError, setStoryError] = useState("");
   const [storyLoading, setStoryLoading] = useState(false);
   const [createdStoryId, setCreatedStoryId] = useState<string | null>(null);
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+
+  // Function to generate slug from title
+  function generateSlug(text: string): string {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "d")
+      .replace(/[^a-z0-9\s-]/g, "") // Remove special chars
+      .trim()
+      .replace(/\s+/g, "-") // Replace spaces with -
+      .replace(/-+/g, "-"); // Remove duplicate -
+  }
+
+  // Auto-generate slug when title changes (unless manually edited)
+  function handleTitleChange(newTitle: string) {
+    setStoryForm((f) => ({ 
+      ...f, 
+      title: newTitle,
+      slug: slugManuallyEdited ? f.slug : generateSlug(newTitle)
+    }));
+  }
+
+  // Mark slug as manually edited when user changes it
+  function handleSlugChange(newSlug: string) {
+    setSlugManuallyEdited(true);
+    setStoryForm((f) => ({ ...f, slug: newSlug }));
+  }
 
   const [episodeForm, setEpisodeForm] = useState({ title: "", audioUrl: "", order: 1, duration: 0, isFreePreview: false });
   const [episodeError, setEpisodeError] = useState("");
@@ -57,11 +87,12 @@ export default function AdminCreateStoryPage() {
         <form onSubmit={handleCreateStory} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-300">Tiêu đề</label>
-            <input type="text" required value={storyForm.title} onChange={(e) => setStoryForm((f) => ({ ...f, title: e.target.value }))} className={inputClass} />
+            <input type="text" required value={storyForm.title} onChange={(e) => handleTitleChange(e.target.value)} className={inputClass} />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-300">Slug</label>
-            <input type="text" required pattern="^[a-z0-9-]+$" value={storyForm.slug} onChange={(e) => setStoryForm((f) => ({ ...f, slug: e.target.value }))} placeholder="vi-du-slug" className={inputClass} />
+            <label className="mb-1 block text-sm font-medium text-gray-300">Slug (tự động tạo từ tiêu đề)</label>
+            <input type="text" required pattern="^[a-z0-9-]+$" value={storyForm.slug} onChange={(e) => handleSlugChange(e.target.value)} placeholder="vi-du-slug" className={inputClass} />
+            <p className="mt-1 text-xs text-gray-500">Slug sẽ tự động tạo từ tiêu đề. Bạn có thể chỉnh sửa nếu cần.</p>
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-300">Mô tả</label>
