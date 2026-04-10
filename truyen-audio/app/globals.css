@@ -51,11 +51,40 @@ button, a, [role="button"], input[type="submit"] {
   cursor: pointer;
   touch-action: manipulation;
   pointer-events: auto;
+  /* Prevent 300ms delay on mobile */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 button, input[type="submit"] {
   -webkit-appearance: none;
   appearance: none;
+}
+
+/* Improve touch target sizes for mobile */
+@media (pointer: coarse) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Prevent double-tap zoom on buttons */
+button:focus, a:focus {
+  outline: none;
+}
+
+/* Active state for better mobile feedback */
+button:active, a:active, [role="button"]:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+/* Fix for iOS Safari modal overlay */
+.modal-overlay {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 ::-webkit-scrollbar { width: 6px; }

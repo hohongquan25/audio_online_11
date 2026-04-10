@@ -64,18 +64,29 @@ export default function Modal({ isOpen, onClose, title, className, children }: M
     };
   }, [isOpen, handleKeyDown]);
 
+  // Handle touch events for mobile
+  const handleOverlayInteraction = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    // Only close if clicking/touching the overlay itself, not the dialog
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  }, [onClose]);
+
   if (!isOpen) return null;
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       role="presentation"
+      style={{ touchAction: 'none' }}
     >
       {/* Overlay */}
       <div
         className="fixed inset-0 bg-black/50"
         aria-hidden="true"
-        onClick={onClose}
+        onClick={handleOverlayInteraction}
+        onTouchEnd={handleOverlayInteraction}
+        style={{ touchAction: 'auto' }}
       />
 
       {/* Dialog */}
@@ -89,13 +100,19 @@ export default function Modal({ isOpen, onClose, title, className, children }: M
           "relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-xl focus:outline-none",
           className
         )}
+        style={{ touchAction: 'auto' }}
       >
         {title && (
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
             <button
               onClick={onClose}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                onClose();
+              }}
               aria-label="Đóng"
+              style={{ touchAction: 'manipulation', minWidth: '44px', minHeight: '44px' }}
               className="rounded-md p-1 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
