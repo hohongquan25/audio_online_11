@@ -41,13 +41,33 @@ export default function EpisodeList({ episodes, userRole, storyIsVip, storyTitle
   }
 
   function handlePlay(episode: Episode) {
+    console.log('[EpisodeList] handlePlay called for episode:', episode.id, episode.title);
+    console.log('[EpisodeList] User interaction - creating audio immediately');
+    
     if (!canPlay(episode)) {
+      console.log('[EpisodeList] Cannot play - showing modal');
       if (!isLoggedIn) setModalType("login");
       else setModalType("vip");
       return;
     }
     
     if (episode.audioUrl && storyTitle && storySlug) {
+      console.log('[EpisodeList] Creating audio element immediately to preserve user interaction');
+      
+      // CRITICAL FOR iOS: Create and play audio SYNCHRONOUSLY in click handler
+      const tempAudio = new Audio(episode.audioUrl);
+      tempAudio.play()
+        .then(() => {
+          console.log('[EpisodeList] ✅ Immediate play succeeded - iOS will allow audio');
+          // Pause it immediately, AudioPlayer will take over
+          tempAudio.pause();
+        })
+        .catch((err) => {
+          console.log('[EpisodeList] ❌ Immediate play failed:', err.message);
+        });
+      
+      console.log('[EpisodeList] Calling play() from AudioContext...');
+      
       // Find next episode
       const currentIndex = episodes.findIndex(ep => ep.id === episode.id);
       const nextEp = currentIndex >= 0 && currentIndex < episodes.length - 1 ? episodes[currentIndex + 1] : null;
@@ -84,7 +104,10 @@ export default function EpisodeList({ episodes, userRole, storyIsVip, storyTitle
           userIsVip: isVip
         }
       );
+      
+      console.log('[EpisodeList] play() called successfully');
     } else {
+      console.log('[EpisodeList] Missing data, redirecting to /listen/' + episode.id);
       router.push(`/listen/${episode.id}`);
     }
   }
