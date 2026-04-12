@@ -55,6 +55,7 @@ export default function VipPlans({ user, plans, qrInfo }: Props) {
 
   if (step === "qr" && selectedPlan) {
     const transferContent = user?.code ? generateTransferContent(user.code, selectedPlan.name) : "";
+    const qrImageWithData = `${qrInfo.qrImage}?amount=${selectedPlan.price}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(qrInfo.accountName)}`;
     
     return (
       <div className="mx-auto max-w-md">
@@ -64,7 +65,7 @@ export default function VipPlans({ user, plans, qrInfo }: Props) {
 
           <div className="mb-4 flex flex-col items-center">
             <div className="rounded-xl bg-white p-3 shadow-lg">
-              <img src={qrInfo.qrImage} alt="QR Code" className="h-48 w-48" />
+              <img src={qrImageWithData} alt="QR Code" className="h-48 w-48" />
             </div>
             <p className="mt-3 text-sm text-gray-400">Quét mã QR để chuyển khoản</p>
           </div>

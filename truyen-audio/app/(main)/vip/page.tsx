@@ -17,12 +17,12 @@ export default async function VipPage() {
     code: session.user.code || "",
   } : null;
 
-  // QR code info from site settings (we'll use a placeholder)
+  // QR code info from site settings
   const qrInfo = {
-    bankName: "Vietcombank",
-    accountNumber: "1234567890",
-    accountName: "NGUYEN VAN A",
-    qrImage: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=VIETCOMBANK-1234567890-NGUYEN-VAN-A",
+    bankName: "TP Bank",
+    accountNumber: "93250111289",
+    accountName: "HO HONG QUAN",
+    qrImage: "https://img.vietqr.io/image/970423-93250111289-compact2.png",
   };
 
   return (

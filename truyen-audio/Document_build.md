@@ -261,7 +261,8 @@ cd /var/www
 git clone https://github.com/YOUR-USERNAME/truyen-audio.git
 
 # Vào thư mục app
-cd truyen-audio/truyen-audio
+cd cd /var/www/audio_online_11/truyen-audio
+
 
 # Kiểm tra files
 ls -la
@@ -431,8 +432,8 @@ docker-compose exec app npm run seed
 cp nginx.conf /tmp/truyen-audio-nginx.conf
 
 # Thay YOUR-DROPLET-IP bằng IP của bạn
-sed -i "s/your-domain.com/YOUR-DROPLET-IP/g" /tmp/truyen-audio-nginx.conf
-sed -i "s/www.your-domain.com/YOUR-DROPLET-IP/g" /tmp/truyen-audio-nginx.conf
+sed -i "s/your-domain.com/168.144.41.45/g" /tmp/truyen-audio-nginx.conf
+sed -i "s/www.your-domain.com/168.144.41.45/g" /tmp/truyen-audio-nginx.conf
 
 # Copy vào nginx
 cp /tmp/truyen-audio-nginx.conf /etc/nginx/sites-available/truyen-audio
