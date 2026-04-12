@@ -12,7 +12,16 @@ const adminPrefixes = ["/admin"];
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({ 
+    req, 
+    secret: process.env.NEXTAUTH_SECRET,
+    secureCookie: process.env.NODE_ENV === "production",
+  });
+
+  // Debug log
+  console.log("Middleware - pathname:", pathname);
+  console.log("Middleware - token:", token ? "exists" : "null");
+  console.log("Middleware - role:", token?.role);
 
   // Check if the route requires authentication
   const isProtectedRoute =
