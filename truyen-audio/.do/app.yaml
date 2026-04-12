@@ -1,0 +1,90 @@
+name: truyen-audio
+region: sgp
+
+# Database
+databases:
+  - name: truyen-audio-db
+    engine: PG
+    version: "15"
+    production: true
+    cluster_name: truyen-audio-db-cluster
+
+# Main Application
+services:
+  - name: web
+    github:
+      repo: your-username/truyen-audio
+      branch: main
+      deploy_on_push: true
+    
+    source_dir: /truyen-audio
+    
+    build_command: npm run build
+    run_command: npm start
+    
+    environment_slug: node-js
+    
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    
+    http_port: 3000
+    
+    health_check:
+      http_path: /api/health
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    
+    envs:
+      - key: NODE_ENV
+        value: production
+      
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        type: SECRET
+      
+      - key: NEXTAUTH_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      
+      - key: NEXTAUTH_URL
+        scope: RUN_TIME
+        value: ${APP_URL}
+      
+      - key: SMTP_HOST
+        scope: RUN_TIME
+        value: smtp.gmail.com
+      
+      - key: SMTP_PORT
+        scope: RUN_TIME
+        value: "587"
+      
+      - key: SMTP_USER
+        scope: RUN_TIME
+        type: SECRET
+      
+      - key: SMTP_PASS
+        scope: RUN_TIME
+        type: SECRET
+      
+      - key: SMTP_FROM
+        scope: RUN_TIME
+        value: "TruyệnAudio <your-email@gmail.com>"
+
+# Jobs (for migrations)
+jobs:
+  - name: migrate
+    kind: PRE_DEPLOY
+    github:
+      repo: your-username/truyen-audio
+      branch: main
+    source_dir: /truyen-audio
+    run_command: npx prisma migrate deploy
+    environment_slug: node-js
+    instance_size_slug: basic-xxs
+    envs:
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        type: SECRET
