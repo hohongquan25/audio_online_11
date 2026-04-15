@@ -23,6 +23,31 @@ export async function middleware(req: NextRequest) {
   console.log("Middleware - token:", token ? "exists" : "null");
   console.log("Middleware - role:", token?.role);
 
+  // Check if user is banned - force logout
+  if (token?.id) {
+    try {
+      const { prisma } = await import("@/lib/prisma");
+      const user = await prisma.user.findUnique({
+        where: { id: token.id as string },
+        select: { isBanned: true },
+      });
+      
+      if (user?.isBanned) {
+        const loginUrl = new URL("/login", req.nextUrl.origin);
+        loginUrl.searchParams.set("error", "banned");
+        const response = NextResponse.redirect(loginUrl);
+        
+        // Clear session cookies
+        response.cookies.delete("next-auth.session-token");
+        response.cookies.delete("__Secure-next-auth.session-token");
+        
+        return response;
+      }
+    } catch (error) {
+      console.error("Middleware - Error checking banned status:", error);
+    }
+  }
+
   // Check if the route requires authentication
   const isProtectedRoute =
     protectedRoutes.includes(pathname) ||

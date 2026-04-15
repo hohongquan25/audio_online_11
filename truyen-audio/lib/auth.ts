@@ -33,6 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
   providers: [
     Credentials({
@@ -53,6 +54,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!user) return null;
 
+        // Check if user is banned
+        if (user.isBanned) {
+          return null;
+        }
+
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) return null;
 
@@ -62,6 +68,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           vipExpiredAt: user.vipExpiredAt,
           code: user.code,
+          isBanned: user.isBanned,
         };
       },
     }),
@@ -81,9 +88,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.id },
-            select: { role: true, vipExpiredAt: true, code: true },
+            select: { role: true, vipExpiredAt: true, code: true, isBanned: true },
           });
           if (dbUser) {
+            // Check if user is banned - force logout
+            if (dbUser.isBanned) {
+              return null as any; // This will invalidate the token
+            }
+
             token.role = dbUser.role as "USER" | "VIP" | "ADMIN";
             token.vipExpiredAt = dbUser.vipExpiredAt;
             token.code = dbUser.code;
